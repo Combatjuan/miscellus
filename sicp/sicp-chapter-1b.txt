@@ -1,0 +1,63 @@
+; a > b > c -> ab
+; b > a > c -> ab
+; a = b > c -> ab
+; a > c > b -> ac
+; c > a > b -> ac
+; a = c > b -> ac
+; b > c > a -> bc
+; c > b > a -> bc
+; b = c > a -> bc
+
+
+; a > b = c -> ab or ac
+; b > a = c -> ab or bc
+; c > a = b -> ca or cb
+; a = b = c -> ab or ac or bc
+
+
+
+
+(list
+	(list 6 3 2 1)
+	(list 6 3 1 2)
+	(list 6 2 3 1)
+	(list 6 1 3 2)
+	(list 6 2 1 3)
+	(list 6 1 2 3)
+	(list 4 2 2 1)
+	(list 4 2 1 2)
+	(list 4 1 2 2)
+	(list 2 2 1 1)
+	(list 2 1 2 1)
+	(list 2 1 1 2)
+	(list 1 1 1 1))
+
+
+(list
+	(list 3 2 1)
+	(list 3 1 2)
+	(list 2 3 1)
+	(list 1 3 2)
+	(list 2 1 3)
+	(list 1 2 3)
+	(list 2 2 1)
+	(list 2 1 2)
+	(list 1 2 2)
+	(list 2 1 1)
+	(list 1 2 1)
+	(list 1 1 2)
+	(list 1 1 1))
+
+; a > b > c -> ab
+; a > c > b -> ac
+; b > a > c -> ab
+; b > c > a -> bc
+; c > a > b -> ac
+; c > b > a -> bc
+; a = b > c -> ab
+; a = c > b -> ac
+; b = c > a -> bc
+; a > b = c -> ab or ac
+; b > a = c -> ab or bc
+; c > a = b -> ca or cb
+; a = b = c -> ab or ac or bc
