@@ -4,6 +4,15 @@
 ; Because I'm lazy.
 (define (p ...) (displayln ...))
 
+(define (header s)
+	(fprintf (current-output-port) "~n----------------------------------------~n- ~a~n----------------------------------------~n" s))
+
+; Because it makes output nicer.
+(define (check e v)
+	(if (eq? (eval e) v)
+		(fprintf (current-output-port) "~s -> ~s~n" e v)
+		(fprintf (current-output-port) "Error: ~s <> ~s~n" e v)))
+
 ; racket apparently doesn't define nil.
 ; So we can fill in code portions from the book, let's create analogous defines.
 (define nil '())
@@ -38,8 +47,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Excercise 2.17")
+(header "Excercise 2.17")
 (define (last-pair l)
 	(if (null? (cdr l))
 		(car l)
@@ -56,8 +64,7 @@
 ;!			(sum-iter (cdr l) (+ running-total cons(l))))))
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.18")
+(header "Exercise 2.18")
 (define (my-reverse l)
 	(if (null? (cdr l))
 		(list (car l))
@@ -80,8 +87,7 @@
 ;!(p (my-reverse3 '(1 2 3 4 5 6 7)))
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.20")
+(header "Exercise 2.20")
 
 (define (my-filter l predicate?)
 	(if (null? (cdr l))
@@ -120,8 +126,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.25")
+(header "Exercise 2.25")
 
 (p (car (cdr (car (cdr (cdr (list 1 3 (list 5 7) 9)))))))
 (p (car (car (list (list 7)))))
@@ -129,8 +134,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.27 'Deep Reverse'")
+(header "Exercise 2.27 'Deep Reverse'")
 (p "  ((1 2) (3 4)) -> ((4 3) (2 1))")
 
 (define (my-reverse l)
@@ -172,8 +176,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.28 'Fringe'")
+(header "Exercise 2.28 'Fringe'")
 (p "  ((1 2) (3 4)) -> (1 2 3 4)")
 (define (fringe t)
 	(cond
@@ -188,8 +191,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.29 'Mobile")
+(header "Exercise 2.29 'Mobile")
 ;!(define (make-mobile left right)
 ;!	(list left right))
 ;!
@@ -281,8 +283,7 @@
 
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.31 'map-tree'")
+(header "Exercise 2.31 'map-tree'")
 
 (define (map-tree f t)
 	(cond 
@@ -298,10 +299,8 @@
 
 (p (map-tree square '((1 2) (3 4 (5) (6 7)))))
 
-
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.32 'subsets'")
+(header "Exercise 2.32 'subsets'")
 
 (define (subsets s)
 	(p s)
@@ -319,8 +318,7 @@
 ; WHOA!  IT WORKED!
 
 ;-------------------------------------------------------------------------------
-(p "----------------------------------------")
-(p "Exercise 2.33 'subsets'")
+(header "Exercise 2.33 'subsets'")
 
 (define (my-map p sequence)
 	(accumulate (lambda (x y) (cons (p x) y) ) nil sequence))
@@ -341,8 +339,7 @@
 ; Almost win.  Wrong arity first time.
 
 
-(p "----------------------------------------")
-(p "Exercise 2.34 'Horner'")
+(header "Exercise 2.34 'Horner'")
 
 (define (horner x coefficients)
 	(accumulate
@@ -355,24 +352,21 @@
 
 ; Interesting footnote about proof of Horner's Law being the first proof of optimal algorithms.
 
-(p "----------------------------------------")
-(p "Exercise 2.35 'More Leaf Counting'")
+(header "Exercise 2.35 'More Leaf Counting'")
 (define (gotta-count-em-all sequence)
 	(accumulate + 0 (map (lambda (x) 1) (fringe sequence))))
 (p (gotta-count-em-all '(1 (2 3 (4) (5) (6 7))))) ; 7
 ; Boom. Headshot.
 
 
-(p "----------------------------------------")
-(p "Exercise 2.40 'Unique Pairs'")
+(header "Exercise 2.40 'Unique Pairs'")
 ;       1      2      3     4
 ;1    -   (1, 2) (1, 3) (1, 4)
 ;2    -      -   (2, 3) (1, 4)
 ;3    -      -      -   (1, 4)
 ;4    -      -      -      -  
 
-(p "----------------------------------------")
-(p "Exercise 2.42 'Three Adderands")
+(header "Exercise 2.42 'Three Adderands")
 ; find all (i, j, k) where i != j != k and i < n, j < n, k < n, and i + j + k = s for a provided n and s.
 
 ; Start at n.  That's k.  Subract k from s.  Find all i + j = s - k.  Start with j < k, i = 0 and go while i < j.
@@ -393,8 +387,7 @@
 ;===============================================================================
 ; 2.3, 2.5
 ;===============================================================================
-(p "----------------------------------------")
-(p "Exercise 2.53 Evaluating Quote")
+(header "Exercise 2.53 Evaluating Quote")
 
 (define (memq item list) ; Returns true if items is in list else false
 	(if (null? list)
@@ -417,8 +410,7 @@
 (p (memq 'red '(red shoes blue socks))) ; true
 
 
-(p "----------------------------------------")
-(p "Exercise 2.54 Implement equal? (List equality)")
+(header "Exercise 2.54 Implement equal? (List equality)")
 
 (define (equal? A B)
 	(cond
@@ -436,8 +428,7 @@
 (p (equal? '(5 2) '(1 2))) ; false
 (p (equal? '() '())) ; true
 
-(p "----------------------------------------")
-(p "Exercise 2.55 Quotable quotes")
+(header "Exercise 2.55 Quotable quotes")
 
 (p (car ''abracadabra))
 ; -> (p (car (quote (quote abracadabra))))
@@ -445,8 +436,7 @@
 ; -> (p (car '(quote abracadabra)))
 
 
-(p "----------------------------------------")
-(p "Symbolic Algebra")
+(header "Symbolic Algebra")
 
 (define (deriv exp var)
 	(cond
@@ -495,9 +485,9 @@
 ; I typed the above 45 lines exactly correctly.  Woot.
 
 ; Now some code to make the output 'simpler'
-; Make multiplication by 0 and 1 reasonable.
 (define (eq-number? x n) (and (number? x) (eq? x n)))
 
+; Make multiplication by 0 and 1 reasonable.
 (define (make-product m1 m2)
 	(cond
 		((or (eq-number? m1 0) (eq-number? m2 0)) '0)
@@ -506,6 +496,7 @@
 		((and (number? m1) (number? m2)) (* m1 m2))
 		(else (list '* m1 m2))))
 
+; Make addition of 0 and constant addition reasonable.
 (define (make-sum a1 a2)
 	(cond
 		((eq-number? a1 0) a2)
@@ -520,5 +511,33 @@
 (p (deriv '(* (* x y) (+ x 3)) 'x))
 
 
-(p "----------------------------------------")
-(p "Exercise 2.56")
+(header "Exercise 2.56")
+
+; Add support for exponentiation.
+(define (** x n)
+	(define (**-iter x n v)
+		(if (= n 0) v
+			(**-iter x (- n 1) (* x v))))
+	(**-iter x n 1))
+
+(check '(+ 2 2) 4)
+(check '(+ 2 2) 5)
+
+; Test
+(p "Testing exponentiation")
+(check '(** 2 10) 1024)
+(check '(** 5 0) 1)
+(check '(** 3 4) 81)
+(check '(** 1000000 1) 1000000 )
+
+(define (exponentiation? x)
+	(and (pair? x) (eq? (car x) '**)))
+
+(define (base s) (cadr s))
+
+(define (exponent s) (caddr s))
+
+(define (make-exponent b e) (list '** b e))
+
+
+
