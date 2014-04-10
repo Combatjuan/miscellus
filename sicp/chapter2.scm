@@ -49,16 +49,35 @@
 (p (last-pair (list 1 2 3)))
 
 ;-------------------------------------------------------------------------------
+;!(define (sum l)
+;!	(define (sum-iter l running-toral)
+;!		(if (null? (cdr l))
+;!			(cons l)
+;!			(sum-iter (cdr l) (+ running-total cons(l))))))
+
+;-------------------------------------------------------------------------------
 (p "----------------------------------------")
 (p "Exercise 2.18")
-(define (reverse l)
+(define (my-reverse l)
 	(if (null? (cdr l))
 		(list (car l))
-		(append (reverse (cdr l)) (list (car l))) 
+		(append (my-reverse (cdr l)) (list (car l))) 
 	)
 )
 
-(p (reverse (list 1 2 3 4 5 6)))
+(define (my-reverse2 l)
+	(if (null? l)
+		nil
+		(cons (my-reverse2 (cdr l)) (car l))))
+
+;!(define (my-reverse3 l)
+;!	(define (my-reverse3-iter l reversed)
+;!		(if (null? (cdr l))
+;!			(
+
+(p (my-reverse (list 1 2 3 4 5 6)))
+(p (my-reverse2 '(1 2 3 4 5 6 7)))
+;!(p (my-reverse3 '(1 2 3 4 5 6 7)))
 
 ;-------------------------------------------------------------------------------
 (p "----------------------------------------")
@@ -99,19 +118,6 @@
 (p (same-parity 1 2 3 4 5 6 7))
 (p (same-parity 2 3 4 5 6 7))
 
-
-(define (my-filter l predicate?)
-	(if (null? (cdr l))
-		(if (predicate? (car l))
-			(list (car l))
-			(list)
-		)
-		(if (predicate? (car l))
-			(append (list (car l)) (my-filter (cdr l) predicate?))
-			(my-filter (cdr l) predicate?)
-		)
-	)
-)
 
 ;-------------------------------------------------------------------------------
 (p "----------------------------------------")
@@ -184,7 +190,6 @@
 ;-------------------------------------------------------------------------------
 (p "----------------------------------------")
 (p "Exercise 2.29 'Mobile")
-
 ;!(define (make-mobile left right)
 ;!	(list left right))
 ;!
@@ -337,7 +342,7 @@
 
 
 (p "----------------------------------------")
-(p "Exercise 2.34 'Horner")
+(p "Exercise 2.34 'Horner'")
 
 (define (horner x coefficients)
 	(accumulate
@@ -351,9 +356,169 @@
 ; Interesting footnote about proof of Horner's Law being the first proof of optimal algorithms.
 
 (p "----------------------------------------")
-(p "Exercise 2.35 'More Leaf Counting")
+(p "Exercise 2.35 'More Leaf Counting'")
 (define (gotta-count-em-all sequence)
 	(accumulate + 0 (map (lambda (x) 1) (fringe sequence))))
 (p (gotta-count-em-all '(1 (2 3 (4) (5) (6 7))))) ; 7
 ; Boom. Headshot.
 
+
+(p "----------------------------------------")
+(p "Exercise 2.40 'Unique Pairs'")
+;       1      2      3     4
+;1    -   (1, 2) (1, 3) (1, 4)
+;2    -      -   (2, 3) (1, 4)
+;3    -      -      -   (1, 4)
+;4    -      -      -      -  
+
+(p "----------------------------------------")
+(p "Exercise 2.42 'Three Adderands")
+; find all (i, j, k) where i != j != k and i < n, j < n, k < n, and i + j + k = s for a provided n and s.
+
+; Start at n.  That's k.  Subract k from s.  Find all i + j = s - k.  Start with j < k, i = 0 and go while i < j.
+; n = 6, k = 10
+; 6, 4, 0
+; 6, 3, 1
+; 5, 4, 2
+
+(define (two-adderands m n)
+	(define (two-adderands-iter m n i)
+		(if (> n i)
+			(cons (cons (- m i) i) (two-adderands-iter m n (+ 1 i)))
+			(nil)))
+	(two-adderands-iter m n 0)
+)
+
+
+;===============================================================================
+; 2.3, 2.5
+;===============================================================================
+(p "----------------------------------------")
+(p "Exercise 2.53 Evaluating Quote")
+
+(define (memq item list) ; Returns true if items is in list else false
+	(if (null? list)
+		false
+		(if (eq? item (car list))
+			true
+			(memq item (cdr list)))))
+
+(p (memq 1 '(1 2 3 4 5)))
+(p (memq 6 (list 1 2 3 4 5)))
+
+
+(p (list 'a 'b 'c)) ; -> (a b c)
+(p (list (list 'george))) ; -> ((george))
+(p (cdr '((x1 x2) (y1 y2)))) ; -> (y1 y2) ; Nope, cdr of a list is a list with one elemnt.  So ((y1 y2))
+(p (cadr '((x1 x2) (y1 y2)))) ; -> (y1 y2)
+
+(p (pair? (car '(a short list)))) ; -> false 
+(p (memq 'red '((red shoes) (blue socks)))) ; -> false
+(p (memq 'red '(red shoes blue socks))) ; true
+
+
+(p "----------------------------------------")
+(p "Exercise 2.54 Implement equal? (List equality)")
+
+(define (equal? A B)
+	(cond
+		((and (null? A) (null? B)) true)
+		((null? A) false)
+		((null? B) false)
+		(else (if (eq? (car A) (car B))
+			(equal? (cdr A) (cdr B))
+			false))))
+
+(p (equal? '(1 2 3) '(1 2 3))) ; true
+(p (equal? '(1 2 3) '(1 2 4))) ; false
+(p (equal? '(1 2 3) '(1 2))) ; false
+(p (equal? '(1 2) '(1 2 3))) ; false
+(p (equal? '(5 2) '(1 2))) ; false
+(p (equal? '() '())) ; true
+
+(p "----------------------------------------")
+(p "Exercise 2.55 Quotable quotes")
+
+(p (car ''abracadabra))
+; -> (p (car (quote (quote abracadabra))))
+; -> (p (car (quote (quote abracadabra))))
+; -> (p (car '(quote abracadabra)))
+
+
+(p "----------------------------------------")
+(p "Symbolic Algebra")
+
+(define (deriv exp var)
+	(cond
+		((number? exp) 0)
+		((variable? exp)
+			(if (same-variable? exp var) 1 0))
+		((sum? exp)
+			(make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+		((product? exp)
+			(make-sum 
+				(make-product
+					(multiplier exp)
+					(deriv (multiplicand exp) var))
+				(make-product
+					(deriv (multiplier exp) var)
+					(multiplicand exp))))
+		(else (error "Unknown expression type -- DRIV" exp))))
+
+(define (variable? x) (symbol? x))
+
+(define (same-variable? v1 v2) (and (variable? v1) (variable? v2) (eq? v1 v2)))
+
+(define (make-sum a1 a2) (list '+ a1 a2))
+
+(define (make-product m1 m2) (list '* m1 m2))
+
+(define (sum? x)
+	(and (pair? x) (eq? (car x) '+)))
+
+(define (addend s) (cadr s))
+
+(define (augend s) (caddr s))
+
+(define (product? x)
+	(and (pair? x) (eq? (car x) '*)))
+
+(define (multiplier p) (cadr p))
+
+(define (multiplicand p) (caddr p))
+
+; Initial tests
+(p (deriv '(+ x 3) 'x))
+(p (deriv '(* x y) 'x))
+(p (deriv '(* (* x y) (+ x 3)) 'x))
+
+; I typed the above 45 lines exactly correctly.  Woot.
+
+; Now some code to make the output 'simpler'
+; Make multiplication by 0 and 1 reasonable.
+(define (eq-number? x n) (and (number? x) (eq? x n)))
+
+(define (make-product m1 m2)
+	(cond
+		((or (eq-number? m1 0) (eq-number? m2 0)) '0)
+		((eq-number? m1 1) m2)
+		((eq-number? m2 1) m1)
+		((and (number? m1) (number? m2)) (* m1 m2))
+		(else (list '* m1 m2))))
+
+(define (make-sum a1 a2)
+	(cond
+		((eq-number? a1 0) a2)
+		((eq-number? a2 0) a1)
+		((and (number? a1) (number? a2)) (+ a1 a2))
+		(else (list '+ a1 a2))))
+
+; Better?
+(p "New and improved")
+(p (deriv '(+ x 3) 'x))
+(p (deriv '(* x y) 'x))
+(p (deriv '(* (* x y) (+ x 3)) 'x))
+
+
+(p "----------------------------------------")
+(p "Exercise 2.56")
