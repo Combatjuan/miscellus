@@ -9,9 +9,9 @@
 
 ; Because it makes output nicer.
 (define (check e v)
-	(if (eq? (eval e) v)
+	(if (equal? (eval e) v)
 		(fprintf (current-output-port) "~s -> ~s~n" e v)
-		(fprintf (current-output-port) "Error: ~s <> ~s~n" e v)))
+		(fprintf (current-output-port) "Error: ~s -> ~s <> ~s~n" e (eval e) v)))
 
 ; racket apparently doesn't define nil.
 ; So we can fill in code portions from the book, let's create analogous defines.
@@ -528,7 +528,7 @@
 (check '(** 2 10) 1024)
 (check '(** 5 0) 1)
 (check '(** 3 4) 81)
-(check '(** 1000000 1) 1000000 )
+(check '(** 1000000 1) 1000000)
 
 (define (exponentiation? x)
 	(and (pair? x) (eq? (car x) '**)))
@@ -539,5 +539,66 @@
 
 (define (make-exponent b e) (list '** b e))
 
+(define (make-exponent b e)
+	(cond
+		((eq-number? e 0) 1)
+		((eq-number? e 1) b)
+		((and (number? b) (number? e)) (** b e))
+		(else (list '** b e))))
 
+
+; From 2.57
+; (+ a b c d)
+; (+ (a (b (c (d nil)))))
+; -> (+ (b (c (d nil))))
+; (+ a b)
+; (
+(define (augend s)
+	(if (null? (cdddr s)); (+ a b)
+		(caddr s) 
+		(make-sum (caddr s) (cadddr s)))) ; (+ a b c d)
+
+
+(define (multiplicand p)
+	(if (null? (cdddr p))
+		(caddr p)
+		(make-product (caddr p) (cadddr p))))
+
+(define (deriv exp var)
+	(cond
+		((number? exp) 0)
+		((variable? exp)
+			(if (same-variable? exp var) 1 0))
+		((sum? exp)
+			(make-sum (deriv (addend exp) var) (deriv (augend exp) var)))
+		((product? exp)
+			(make-sum 
+				(make-product
+					(multiplier exp)
+					(deriv (multiplicand exp) var))
+				(make-product
+					(deriv (multiplier exp) var)
+					(multiplicand exp))))
+		((exponentiation? exp)
+			(make-product 
+				(make-product (exponent exp) (make-exponent (base exp) (- (exponent exp) 1)))
+				(deriv (base exp) var)))
+		(else (error "Unknown expression type -- DRIV" exp))))
+
+(check '1 1)
+(check ''y 'y)
+(check '(map square '(1 2 3)) '(1 4 9))
+(check '(deriv '(** x 2) 'x) '(* 2 x))
+; Correct but not simplified.
+(check '(deriv '(+ (* 5 (** x 3)) (* 2 (** x 2))) 'x) '(+ (* 15 (** x 2) (* 4 x))))
+
+;-------------------------------------------------------------------------------
+(header "Exercise 2.57 - Handle n-ary + and * operators")
+; Try and do this without changing the definition of deriv.
+(p (deriv '(* x y (+ x 3)) 'x))
+; Too sleeping to remember if the answer given (+ (* x y) (* y (+ x r))) is correct.
+(p (deriv '(+ (** x 3) (* 4 (** x 2)) (* 8 x) 9) 'x))
+(check '(deriv '(+ (** x 3) (* 4 (** x 2)) (* 8 x) 9) 'x) '(+ (* 3 (** x 2)) (* 8 x) 8))
+; Again, worked, not quite simplified enough.
+; Should be possible to write a function that flattens these out.
 
