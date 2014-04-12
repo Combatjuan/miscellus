@@ -10,8 +10,8 @@
 ; Because it makes output nicer.
 (define (check e v)
 	(if (equal? (eval e) v)
-		(fprintf (current-output-port) "~s -> ~s~n" e v)
-		(fprintf (current-output-port) "Error: ~s -> ~s <> ~s~n" e (eval e) v)))
+		(fprintf (current-output-port) "~s~n -> ~s~n" e v)
+		(fprintf (current-output-port) "FAIL:~n~s~n -> ~s~n <> ~s~n" e (eval e) v)))
 
 ; racket apparently doesn't define nil.
 ; So we can fill in code portions from the book, let's create analogous defines.
@@ -602,3 +602,71 @@
 ; Again, worked, not quite simplified enough.
 ; Should be possible to write a function that flattens these out.
 
+; I am going to skip Exercise 2.58 for now.  Sounds like tedium.
+
+;-------------------------------------------------------------------------------
+(header "Exercise 2.59 - Sets (implement union)")
+
+; Set membership
+(define (element-of-set? x set)
+	(cond
+		((null? set) false)
+		((eq? (car set) x) true)
+		(else (element-of-set? x (cdr set)))))
+(check '(element-of-set? 5 '(1 2 3 4 5 6))
+	true)
+(check '(element-of-set? 5 '(2 4 6))
+	false)
+(check '(element-of-set? 5 '())
+	false)
+(newline)
+
+; Adjoin
+(define (adjoin-set x set)
+	(if (element-of-set? x set) set (cons x set)))
+
+(check '(adjoin-set 1 '(2 3 4))
+	'(1 2 3 4))
+(check '(adjoin-set 'a '(b c d))
+	'(a b c d))
+(check '(adjoin-set 'a '(b c d))
+	'(a b c d))
+(check '(adjoin-set 'a '(a b c d))
+	'(a b c d))
+(check '(adjoin-set 'a '())
+	'(a))
+(newline)
+
+; Intersect
+(define (intersect-set a b)
+	(cond
+		((or (null? a) (null? b)) '())
+		((element-of-set? (car a) b) (cons (car a) (intersect-set (cdr a) b)))
+		(else (intersect-set (cdr a) b))))
+
+(check '(intersect-set '(1 2 3) '(4 5 6))
+	'())
+(check '(intersect-set '(1 2 3) '(2 4 6))
+	'(2))
+(newline)
+
+; Union
+(define (union-set a b)
+	(cond
+		((null? a) b)
+		((null? b) a)
+		((element-of-set? (car a) b)
+			(union-set (cdr a) b))
+		(else
+			(cons (car a) (union-set (cdr a) b)))))
+
+(check '(union-set '(1 2) '(3 4))
+	'(1 2 3 4))
+(check '(union-set '(1 2 3) '(3 4 5))
+	'(1 2 3 4 5))
+(check '(union-set '() '(1 2))
+	'(1 2))
+(check '(union-set '(1 2) '())
+	'(1 2))
+
+; 
